@@ -33,6 +33,24 @@ describe('GET /sloths', () => {
       .expect('Content-Type', /json/)
       .expect(200, done)
   })
+
+  it('returns an array of all sloth objects when responding with JSON', done => {
+    request(app)
+      .get('/sloths')
+      .end((err, res) => {
+        expect(res.body).to.deep.equal([{
+          id: 1,
+          name: 'Dagny'
+        }, {
+          id: 2,
+          name: 'Wyatt'
+        }, {
+          id: 3,
+          name: 'Caroline'
+        }])
+        done()
+      })
+    })
 })
 
 xdescribe('GET /sloths/:id', () => {
