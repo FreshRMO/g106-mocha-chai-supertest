@@ -5,66 +5,70 @@ const { expect } = require('chai')
 const app = require('../app')
 const knex = require('../knex')
 
-describe('GET /sloths', () => {
-  beforeEach(done => {
-    Promise.all([
-      knex('sloths').insert({id: 1, name: 'Dagny'}),
-      knex('sloths').insert({id: 2, name: 'Wyatt'}),
-      knex('sloths').insert({id: 3, name: 'Caroline'})
-    ])
+describe('Inside test database', () => {
+  beforeEach('Migrate TEST database', done => {
+    knex.schema.createTable('sloths', function(table) {
+      table.increments()
+      table.string('name')
+    })
     .then(() => {
-      console.error('done 1')
       done()
     })
   })
 
-  afterEach(done => { 
-    knex('sloths')
-      .del()
-      .then(() => {
-        console.error('done 2')
-        done()
-      })
+  afterEach('Drop TEST database', done => {
+    knex.schema.dropTable('sloths').then(() => done())
   })
-
-  it('responds with JSON', done => {
-    request(app)
-      .get('/sloths')
-      .expect('Content-Type', /json/)
-      .expect(200, done)
-  })
-
-  it('returns an array of all sloth objects when responding with JSON', done => {
-    request(app)
-      .get('/sloths')
-      .end((err, res) => {
-        expect(res.body).to.deep.equal([{
-          id: 1,
-          name: 'Dagny'
-        }, {
-          id: 2,
-          name: 'Wyatt'
-        }, {
-          id: 3,
-          name: 'Caroline'
-        }])
-        done()
-      })
+  
+  describe('GET /sloths', () => {
+    beforeEach(done => {
+      Promise.all([
+        knex('sloths').insert({id: 1, name: 'Dagny'})
+      ])
+      .then(() => done())
     })
-})
-
-xdescribe('GET /sloths/:id', () => {
-
-})
-
-xdescribe('POST /sloths', () => {
-
-})
-
-xdescribe('PATCH /sloths', () => {
-
-})
-
-xdescribe('DELETE /sloths', () => {
-
+  
+    afterEach(done => { 
+      knex('sloths')
+        .del()
+        .then(() => {
+          done()
+        })
+    })
+  
+    it('responds with JSON', done => {
+      request(app)
+        .get('/sloths')
+        .expect('Content-Type', /json/)
+        .expect(200, done)
+    })
+  
+    it('returns an array of all sloth objects when responding with JSON', done => {
+      request(app)
+        .get('/sloths')
+        .end((err, res) => {
+          expect(res.body).to.deep.equal([{
+            id: 1,
+            name: 'Dagny'
+          }])
+          done()
+        })
+      })
+  })
+  
+  xdescribe('GET /sloths/:id', () => {
+  
+  })
+  
+  xdescribe('POST /sloths', () => {
+  
+  })
+  
+  xdescribe('PATCH /sloths', () => {
+  
+  })
+  
+  xdescribe('DELETE /sloths', () => {
+  
+  })
 })
